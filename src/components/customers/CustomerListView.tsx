@@ -86,7 +86,7 @@ export const CustomerListView: FC<CustomerListViewProps> = ({
         <div>
           <h1 className="text-xl font-bold text-slate-900 tracking-tight">Customer Directory</h1>
           <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mt-0.5">
-            Synced with Creation CRM Leads
+            Customer Directory & Profiles
           </p>
         </div>
 
@@ -191,7 +191,7 @@ export const CustomerListView: FC<CustomerListViewProps> = ({
                   <button
                     onClick={() => {
                       const phone = c.customer_phone?.replace(/\D/g, '') || '';
-                      window.open(`https://wa.me/91${phone}?text=Hello%20${encodeURIComponent(c.customer_name)}%2C%20greetings%20from%20Creation!`, '_blank');
+                      window.open(`https://wa.me/91${phone}?text=Hello%20${encodeURIComponent(c.customer_name)}%2C%20greetings%20from%20our%20Studio!`, '_blank');
                     }}
                     className="p-2 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-100 transition-colors"
                     title="Send WhatsApp"

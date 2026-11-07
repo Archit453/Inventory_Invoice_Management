@@ -296,7 +296,7 @@ export const AppointmentList: FC<AppointmentListProps> = ({
                         <button
                           onClick={() => {
                             const phone = (apt.customer_phone || '').replace(/\D/g, '');
-                            const text = encodeURIComponent(`Hi ${apt.customer_name}, this is Creation confirming your appointment scheduled for ${formatDateTime(apt.appointment_date)}. See you at our studio!`);
+                            const text = encodeURIComponent(`Hi ${apt.customer_name}, confirming your appointment scheduled for ${formatDateTime(apt.appointment_date)}. See you at our studio!`);
                             window.open(`https://wa.me/91${phone}?text=${text}`, '_blank');
                           }}
                           className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 transition-colors uppercase"

@@ -50,7 +50,7 @@ export const ReportsView: FC<ReportsViewProps> = ({ invoices, expenses }) => {
 
   // Comparison Bar Chart Data
   const financialComparisonData = useMemo(() => [
-    { name: 'Creation Studio Revenue', Revenue: totalCollected, Expenses: 0 },
+    { name: 'Studio Revenue', Revenue: totalCollected, Expenses: 0 },
     { name: 'Operational Expenses', Revenue: 0, Expenses: totalExpenses },
   ], [totalCollected, totalExpenses]);
 

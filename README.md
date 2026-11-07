@@ -1,32 +1,34 @@
-# React + TypeScript + Vite
+# Inventory & Invoice Management
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A standalone, library-first billing, inventory, expense, and appointment management application reverse-engineered for high-velocity studio operations.
 
-Currently, two official plugins are available:
+## Architecture
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Frontend**: React 19 + TypeScript + Vite
+- **Styling**: Tailwind CSS + Lucide Icons
+- **Calculations & Validation**: Zod schema validation for line-item tax calculations, split payment validation, and discounts
+- **Visual Analytics**: Recharts SVG responsive bar & donut financial charts
+- **Receipt & Invoice Printing**: Dual-mode `react-to-print` (Standard A4 Tax Invoice & 80mm POS Thermal Receipt)
+- **Data Persistence**: Offline-first reactive store with cloud database sync capability
 
-## React Compiler
+## Key Workflows
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. **Billing Management**: Full invoice ledger with search, filtering, and payment status badges.
+2. **Invoice Generation**: Customer auto-linking, vehicle metadata chips, customizable line items (services & consumables), staff assignment, and single or split payments.
+3. **Product Inventory**: Real-time consumable stock control with minimum stock alert thresholds and rapid `+` / `-` stock adjustments.
+4. **Expense Tracker**: Operational overhead management with category classifications and payment method splits.
+5. **Appointment Scheduler**: Booking management with advance deposit tracking and one-click bill conversion.
+6. **Financial Reports**: P&L metrics, revenue vs. expense comparisons, and expandable deposit audit breakdowns.
 
-## Expanding the Oxlint configuration
+## Getting Started
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+```bash
+# Install dependencies
+npm.cmd install
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+# Start development server
+npm.cmd run dev
+
+# Production build
+npm.cmd run build
 ```
-
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.

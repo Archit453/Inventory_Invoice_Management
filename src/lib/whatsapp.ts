@@ -16,10 +16,10 @@ export function generateInvoiceWhatsAppMessage(invoice: Invoice): string {
     ? `⚠️ *Status:* PARTIALLY PAID (Pending: ${formatINR(invoice.balance_due)})`
     : `❌ *Status:* PAYMENT DUE (${formatINR(invoice.balance_due)})`;
 
-  return `✨ *CREATION* ✨
-Creation Studio — Premium Services & Care
+  return `✨ *TAX INVOICE / BILL* ✨
+Studio Invoicing & Inventory Management
 ────────────────────────
-📋 *TAX INVOICE / BILL: #${invoice.invoice_number}*
+📋 *BILL NO: #${invoice.invoice_number}*
 📅 *Date:* ${formatDateTime(invoice.billing_date)}
 👤 *Customer:* ${invoice.customer_name}
 ${vehicleText ? vehicleText + '\n' : ''}────────────────────────
@@ -32,11 +32,8 @@ ${invoice.discount_amount > 0 ? `🏷️ *Discount:* -${formatINR(invoice.discou
 💳 *Amount Paid:* ${formatINR(invoice.paid_amount)} (${invoice.payment_method})
 ${paymentStatusText}
 ────────────────────────
-📍 *Studio Address:* Plot no - 55, Pahala, Before Utkal Mahindra Service, Bhubaneswar, Odisha 752101
-📞 *Contact:* +91 8456869931
-🗺️ *Location:* https://maps.app.goo.gl/TP4S4MommkGLpAzP7
 
-Thank you for choosing Creation for your vehicle's care!`;
+Thank you for your business!`;
 }
 
 export function openWhatsAppInvoice(invoice: Invoice) {

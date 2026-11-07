@@ -15,7 +15,7 @@ export const InvoicePrintTemplate = forwardRef<HTMLDivElement, InvoicePrintTempl
       return (
         <div ref={ref} className="thermal-receipt p-2 font-mono text-[11px] leading-tight text-black bg-white max-w-[76mm] mx-auto">
           <div className="text-center pb-2 border-b border-dashed border-black">
-            <h2 className="font-bold text-sm tracking-wide uppercase">CREATION</h2>
+            <h2 className="font-bold text-sm tracking-wide uppercase">TAX INVOICE</h2>
             <p className="text-[10px]">Studio & Workshop Management</p>
             <p className="text-[10px]">Ph: +91 8456869931</p>
             <p className="text-[9px] mt-0.5">GSTIN: 21AAFFS9821L1Z0</p>
@@ -95,14 +95,14 @@ export const InvoicePrintTemplate = forwardRef<HTMLDivElement, InvoicePrintTempl
           </div>
 
           <div className="text-center pt-3 text-[9px] space-y-1">
-            <p>Thank you for trusting Creation!</p>
+            <p>Thank you for your business!</p>
             <p>For warranty & maintenance, visit our studio.</p>
           </div>
         </div>
       );
     }
 
-    // Standard A4 Luxury Detailing Tax Invoice
+    // Standard A4 Studio Tax Invoice
     return (
       <div ref={ref} className="p-8 max-w-[210mm] mx-auto bg-white text-slate-900 font-sans print:p-4">
         {/* Top Header */}
@@ -111,11 +111,11 @@ export const InvoicePrintTemplate = forwardRef<HTMLDivElement, InvoicePrintTempl
             <div className="flex items-center gap-2 mb-1">
               <span className="w-4 h-4 rounded-full bg-blue-600 inline-block"></span>
               <h1 className="text-2xl font-black tracking-tight text-slate-900 uppercase">
-                Creation
+                TAX INVOICE
               </h1>
             </div>
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-widest">
-              Creation Studio & Workshop Solutions
+              Studio & Workshop Management
             </p>
             <p className="text-xs text-slate-600 mt-2 max-w-sm leading-relaxed">
               Plot no - 55, Pahala, Before Utkal Mahindra Service,<br />
@@ -276,7 +276,7 @@ export const InvoicePrintTemplate = forwardRef<HTMLDivElement, InvoicePrintTempl
 
         {/* Footer */}
         <div className="mt-12 pt-6 border-t border-slate-200 flex justify-between items-center text-xs text-slate-400">
-          <div>Thank you for choosing Creation for your vehicle's perfection.</div>
+          <div>Thank you for choosing us for your vehicle's perfection.</div>
           <div className="font-medium text-slate-500">Authorized Signature</div>
         </div>
       </div>

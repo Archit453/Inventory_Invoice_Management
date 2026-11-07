@@ -9,8 +9,7 @@ import {
   BarChart3,
   Settings,
   ShieldCheck,
-  PlusCircle,
-  ExternalLink
+  PlusCircle
 } from 'lucide-react';
 import type { MainTabType } from '../../types';
 
@@ -76,8 +75,8 @@ export const Sidebar: FC<SidebarProps> = ({
             <ShieldCheck className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-white font-bold text-sm leading-tight tracking-wide">Creation</h1>
-            <p className="text-[11px] text-blue-400 font-medium uppercase tracking-wider">Billing & Inventory</p>
+            <h1 className="text-white font-bold text-sm leading-tight tracking-wide">Studio OS</h1>
+            <p className="text-[11px] text-blue-400 font-medium uppercase tracking-wider">Inventory & Invoicing</p>
           </div>
         </div>
       </div>
@@ -124,20 +123,15 @@ export const Sidebar: FC<SidebarProps> = ({
         ))}
       </div>
 
-      {/* CRM Link Footer */}
+      {/* System Status Footer */}
       <div className="p-4 border-t border-slate-800/80 bg-slate-900/50">
-        <a
-          href="https://github.com/signaturedetailingbbsr/Signature-Detailing-CRM"
-          target="_blank"
-          rel="noreferrer"
-          className="flex items-center justify-between text-[11px] text-slate-400 hover:text-blue-400 transition-colors"
-        >
+        <div className="flex items-center justify-between text-[11px] text-slate-400">
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span>CRM Database Synced</span>
+            <span>System Active</span>
           </div>
-          <ExternalLink className="w-3.5 h-3.5" />
-        </a>
+          <span className="font-mono text-[10px] text-slate-500">v1.0.0</span>
+        </div>
       </div>
     </aside>
   );

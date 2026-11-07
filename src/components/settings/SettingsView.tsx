@@ -10,15 +10,15 @@ import {
 import { toast } from 'sonner';
 
 export const SettingsView: FC = () => {
-  const [studioName, setStudioName] = useState('Creation');
-  const [studioPhone, setStudioPhone] = useState('+91 8456869931');
-  const [studioEmail, setStudioEmail] = useState('creation.bbsr@gmail.com');
-  const [studioGstin, setStudioGstin] = useState('21AAFFS9821L1Z0');
-  const [studioAddress, setStudioAddress] = useState('Plot no - 55, Pahala, Before Utkal Mahindra Service, Bhubaneswar, Odisha 752101');
+  const [studioName, setStudioName] = useState('Studio & Workshop');
+  const [studioPhone, setStudioPhone] = useState('+91 9876543210');
+  const [studioEmail, setStudioEmail] = useState('contact@studio.com');
+  const [studioGstin, setStudioGstin] = useState('21AAAPL1234L1Z5');
+  const [studioAddress, setStudioAddress] = useState('Studio Operations & Workshop Center, Bhubaneswar');
   
-  const [upiName, setUpiName] = useState('Creation');
-  const [upiId, setUpiId] = useState('creation@hdfcbank');
-  const [googleReviewLink, setGoogleReviewLink] = useState('https://maps.app.goo.gl/TP4S4MommkGLpAzP7');
+  const [upiName, setUpiName] = useState('Studio Operations');
+  const [upiId, setUpiId] = useState('studio@upi');
+  const [googleReviewLink, setGoogleReviewLink] = useState('https://maps.google.com');
 
   const [selectedTheme, setSelectedTheme] = useState('navy');
 
@@ -131,7 +131,7 @@ export const SettingsView: FC = () => {
                 type="text"
                 value={upiName}
                 onChange={(e) => setUpiName(e.target.value)}
-                placeholder="e.g. Creation"
+                placeholder="e.g. Studio Operations"
                 className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold"
               />
               <span className="text-[10px] text-slate-400 mt-1 block">Name shown to customer during UPI payment</span>
@@ -145,7 +145,7 @@ export const SettingsView: FC = () => {
                 type="text"
                 value={upiId}
                 onChange={(e) => setUpiId(e.target.value)}
-                placeholder="creation@hdfcbank"
+                placeholder="studio@upi"
                 className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-blue-600"
               />
               <span className="text-[10px] text-slate-400 mt-1 block">UPI ID to receive direct payments</span>

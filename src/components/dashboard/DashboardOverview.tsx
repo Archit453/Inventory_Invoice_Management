@@ -43,10 +43,10 @@ export const DashboardOverview: FC<DashboardOverviewProps> = ({
       <div className="bg-gradient-to-r from-[#131D31] via-[#1E2D4A] to-[#131D31] rounded-3xl p-8 text-white shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-6 relative overflow-hidden">
         <div className="relative z-10 space-y-2">
           <span className="inline-block px-3 py-1 bg-blue-500/20 text-blue-300 border border-blue-400/30 rounded-full text-[10px] font-bold uppercase tracking-widest">
-            Creation Studio Operations
+            Studio Operations
           </span>
           <h1 className="text-2xl md:text-3xl font-black tracking-tight text-white">
-            Creation Billing & Inventory Control
+            Billing & Inventory Control
           </h1>
           <p className="text-xs text-slate-300 max-w-xl leading-relaxed">
             Manage tax invoicing, technician assignments, stock consumption for PPF & ceramic coatings, customer appointment bookings, and net profitability (Current Net Profit: <span className="font-bold text-emerald-400">{formatINR(netProfit)}</span>).

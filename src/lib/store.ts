@@ -1,7 +1,7 @@
 import { supabase } from './supabase';
 import type { Customer, StudioService, InventoryProduct, Invoice, Expense, Appointment } from '../types';
 
-// Default Seed Data mirroring the demo video & Creation CRM
+// Default Seed Data mirroring the demo video workflow
 export const DEFAULT_SERVICES: StudioService[] = [
   { id: 's-1', name: '🛡️ Garware Plus Hi-Gloss PPF', short_code: 'ppf_garware', tagline: 'Self-healing ultra-gloss TPU protective film', price: 65000, category: 'Paint Protection' },
   { id: 's-2', name: '✨ 9H/10H Dual-Layer Ceramic Shield', short_code: 'ceramic_9h', tagline: 'Extreme candy gloss & hydrophobic barrier', price: 28000, category: 'Ceramic Coating' },
@@ -256,7 +256,7 @@ export const DEFAULT_EXPENSES: Expense[] = [
   },
   {
     id: 'exp-2',
-    title: 'Creation Studio Staff Weekly Wages',
+    title: 'Workshop Staff Weekly Wages',
     category: 'Salaries & Wages',
     amount: 18000,
     payment_mode: 'GPay',
@@ -265,7 +265,7 @@ export const DEFAULT_EXPENSES: Expense[] = [
   },
   {
     id: 'exp-3',
-    title: 'Creation Studio Electricity Bill (3 Phase)',
+    title: 'Studio Electricity Bill (3 Phase)',
     category: 'Utilities & Electricity',
     amount: 6850,
     payment_mode: 'GPay',
@@ -330,12 +330,12 @@ export const DEFAULT_APPOINTMENTS: Appointment[] = [
 
 // LocalStorage Persistence Keys
 const STORAGE_KEYS = {
-  INVOICES: 'creation_invoices_v1',
-  PRODUCTS: 'creation_products_v1',
-  EXPENSES: 'creation_expenses_v1',
-  APPOINTMENTS: 'creation_appointments_v1',
-  CUSTOMERS: 'creation_customers_v1',
-  SERVICES: 'creation_services_v1',
+  INVOICES: 'iim_invoices_v1',
+  PRODUCTS: 'iim_products_v1',
+  EXPENSES: 'iim_expenses_v1',
+  APPOINTMENTS: 'iim_appointments_v1',
+  CUSTOMERS: 'iim_customers_v1',
+  SERVICES: 'iim_services_v1',
 };
 
 // Data Store Class providing unified offline-first + Supabase synchronization

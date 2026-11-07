@@ -1,8 +1,7 @@
 -- ============================================================================
--- CREATION — INVENTORY, INVOICE & EXPENSE MANAGEMENT SCHEMA
+-- INVENTORY & INVOICE MANAGEMENT SCHEMA (STANDALONE SYSTEM)
 -- ============================================================================
--- Integrated with Creation CRM (Supabase)
--- References public.leads (Customers & Vehicles) and public.studio_services
+-- Database Schema for Products, Invoices, Items, Expenses, and Appointments
 -- ============================================================================
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -133,7 +132,7 @@ CREATE TRIGGER trg_invoice_decrement_stock
 AFTER INSERT ON public.invoice_items
 FOR EACH ROW EXECUTE FUNCTION public.decrement_inventory_on_invoice();
 
--- Initial Seed of Inventory Consumables for Creation Studio
+-- Initial Seed of Inventory Consumables
 INSERT INTO public.inventory_products (name, sku, category, unit, current_stock, min_stock_alert, purchase_price, selling_price)
 VALUES
 ('Garware Hi-Gloss PPF Roll (15m)', 'PPF-GAR-15M', 'PPF & Films', 'rolls', 6.00, 2.00, 32000.00, 48000.00),
