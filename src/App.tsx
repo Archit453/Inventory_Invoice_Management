@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import type { MainTabType, Invoice, InventoryProduct, Expense, Appointment, Customer, StudioService } from './types';
 import { DataStore } from './lib/store';
+import { AuthProvider } from './contexts/AuthContext';
+import { TenantProvider, useTenant } from './contexts/TenantContext';
 import { Sidebar } from './components/layout/Sidebar';
 import { DashboardOverview } from './components/dashboard/DashboardOverview';
 import { BillingList } from './components/billing/BillingList';
@@ -13,13 +15,17 @@ import { AppointmentList } from './components/appointments/AppointmentList';
 import { CustomerListView } from './components/customers/CustomerListView';
 import { ReportsView } from './components/reports/ReportsView';
 import { SettingsView } from './components/settings/SettingsView';
+import { AuthModal } from './components/auth/AuthModal';
+import { OnboardingWizard } from './components/auth/OnboardingWizard';
 import { Toaster, toast } from 'sonner';
 import { useReactToPrint } from 'react-to-print';
 
-export function App() {
+function MainAppContent() {
+  const { currentTenant, isOnboarding } = useTenant();
   const [activeTab, setActiveTab] = useState<MainTabType>('billing');
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
-  // Application Data States
+  // Application Data States (Scoped to currentTenant)
   const [invoices, setInvoices] = useState<Invoice[]>(() => DataStore.getInvoices());
   const [products, setProducts] = useState<InventoryProduct[]>(() => DataStore.getProducts());
   const [expenses, setExpenses] = useState<Expense[]>(() => DataStore.getExpenses());
@@ -45,11 +51,16 @@ export function App() {
     documentTitle: createdInvoice ? `Invoice-${createdInvoice.invoice_number}` : 'Invoice',
   });
 
-  // Load CRM Data (Customers & Services) on mount
+  // Re-sync all state whenever currentTenant changes
   useEffect(() => {
+    DataStore.setActiveTenantId(currentTenant.id);
+    setInvoices(DataStore.getInvoices());
+    setProducts(DataStore.getProducts());
+    setExpenses(DataStore.getExpenses());
+    setAppointments(DataStore.getAppointments());
     DataStore.getCustomers().then(setCustomers);
     DataStore.getServices().then(setServices);
-  }, []);
+  }, [currentTenant.id]);
 
   // Handlers for Invoices
   const handleSaveInvoice = (newInv: Invoice) => {
@@ -59,7 +70,7 @@ export function App() {
     setCreatedInvoice(newInv);
     setIsSuccessModalOpen(true);
     setActiveTab('billing');
-    toast.success(`Invoice #${newInv.invoice_number} saved!`);
+    toast.success(`Invoice #${newInv.invoice_number} saved for ${currentTenant.name}!`);
   };
 
   const handleDeleteInvoice = (id: string) => {
@@ -139,7 +150,7 @@ export function App() {
     <div className="flex h-screen w-full bg-slate-50 text-slate-800 overflow-hidden font-sans">
       <Toaster position="top-right" richColors />
 
-      {/* Left Sidebar */}
+      {/* Left Sidebar with Tenant Selector & Role Info */}
       <Sidebar
         activeTab={activeTab}
         setActiveTab={(tab) => {
@@ -152,6 +163,7 @@ export function App() {
           setBillPrefill({});
           setActiveTab('new-bill');
         }}
+        onOpenAuthModal={() => setIsAuthModalOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -265,7 +277,25 @@ export function App() {
         />
       </div>
 
+      {/* Authentication & Role Switcher Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+      />
+
+      {/* New Studio Onboarding Wizard */}
+      {isOnboarding && <OnboardingWizard />}
     </div>
+  );
+}
+
+export function App() {
+  return (
+    <AuthProvider>
+      <TenantProvider>
+        <MainAppContent />
+      </TenantProvider>
+    </AuthProvider>
   );
 }
 

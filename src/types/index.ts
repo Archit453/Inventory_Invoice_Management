@@ -1,3 +1,46 @@
+export type UserRole = 'owner' | 'manager' | 'cashier' | 'technician';
+export type PlanTier = 'free' | 'starter' | 'growth' | 'enterprise';
+
+export interface TenantSettings {
+  currency: string;
+  currency_symbol: string;
+  tax_label: string;
+  default_tax_rate: number;
+  phone?: string;
+  email?: string;
+  address?: string;
+  gstin?: string;
+  upi_name?: string;
+  upi_id?: string;
+  google_review_link?: string;
+  theme?: string;
+}
+
+export interface Tenant {
+  id: string;
+  name: string;
+  slug: string;
+  owner_id?: string;
+  plan_tier: PlanTier;
+  subscription_status: 'trialing' | 'active' | 'past_due' | 'canceled';
+  billing_cycle?: 'monthly' | 'annual';
+  max_invoices_per_month?: number;
+  max_team_members?: number;
+  settings: TenantSettings;
+  created_at?: string;
+}
+
+export interface TenantUser {
+  id: string;
+  tenant_id: string;
+  user_id: string;
+  email: string;
+  full_name?: string;
+  role: UserRole;
+  is_active: boolean;
+  created_at?: string;
+}
+
 export interface VehicleInfo {
   make?: string;
   model?: string;
@@ -8,6 +51,7 @@ export interface VehicleInfo {
 
 export interface Customer {
   id: string;
+  tenant_id?: string;
   customer_name: string;
   customer_phone?: string;
   email?: string;
@@ -18,6 +62,7 @@ export interface Customer {
 
 export interface StudioService {
   id: string;
+  tenant_id?: string;
   name: string;
   short_code?: string;
   tagline?: string;
@@ -28,6 +73,7 @@ export interface StudioService {
 
 export interface InventoryProduct {
   id: string;
+  tenant_id?: string;
   name: string;
   sku: string;
   category: string;
@@ -36,6 +82,7 @@ export interface InventoryProduct {
   min_stock_alert: number;
   purchase_price: number;
   selling_price: number;
+  barcode?: string;
   image_url?: string;
   is_active: boolean;
   created_at?: string;
@@ -43,6 +90,7 @@ export interface InventoryProduct {
 
 export interface InvoiceItem {
   id: string;
+  tenant_id?: string;
   item_type: 'service' | 'product' | 'package';
   item_id?: string;
   name: string;
@@ -62,6 +110,7 @@ export interface PaymentSplitItem {
 
 export interface Invoice {
   id: string;
+  tenant_id?: string;
   invoice_number: string;
   customer_id?: string;
   customer_name: string;
@@ -81,11 +130,13 @@ export interface Invoice {
   payment_split?: PaymentSplitItem[];
   gst_number?: string;
   notes?: string;
+  created_by?: string;
   created_at?: string;
 }
 
 export interface Expense {
   id: string;
+  tenant_id?: string;
   title: string;
   category: 'Raw Materials & Supplies' | 'Salaries & Wages' | 'Rent & Studio' | 'Utilities & Electricity' | 'Tea & Refreshments' | 'Marketing & Ads' | 'Equipment Maintenance' | 'Miscellaneous';
   amount: number;
@@ -97,6 +148,7 @@ export interface Expense {
 
 export interface Appointment {
   id: string;
+  tenant_id?: string;
   customer_id?: string;
   customer_name: string;
   customer_phone?: string;

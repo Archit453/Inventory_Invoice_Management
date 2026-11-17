@@ -1,40 +1,135 @@
 -- ============================================================================
--- INVENTORY & INVOICE MANAGEMENT SCHEMA (STANDALONE SYSTEM)
+-- INVENTORY & INVOICE MANAGEMENT — MULTI-TENANT SAAS DATABASE SCHEMA
 -- ============================================================================
--- Database Schema for Products, Invoices, Items, Expenses, and Appointments
+-- Complete schema with Tenants, User Memberships, Row Level Security (RLS),
+-- Automated Stock Decrements, Invoices, Line Items, Products, Expenses & Appointments
 -- ============================================================================
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
--- 1. INVENTORY PRODUCTS TABLE
-CREATE TABLE IF NOT EXISTS public.inventory_products (
+-- ============================================================================
+-- 1. SAAS TENANTS (ORGANIZATIONS / BUSINESSES)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS public.tenants (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     name VARCHAR(255) NOT NULL,
-    sku VARCHAR(100) UNIQUE,
+    slug VARCHAR(100) UNIQUE NOT NULL,
+    owner_id UUID,
+    plan_tier VARCHAR(50) NOT NULL DEFAULT 'starter', -- 'free', 'starter', 'growth', 'enterprise'
+    subscription_status VARCHAR(50) NOT NULL DEFAULT 'active', -- 'trialing', 'active', 'past_due', 'canceled'
+    billing_cycle VARCHAR(20) DEFAULT 'monthly', -- 'monthly', 'annual'
+    max_invoices_per_month INTEGER DEFAULT 300,
+    max_team_members INTEGER DEFAULT 3,
+    settings JSONB NOT NULL DEFAULT '{
+        "currency": "INR",
+        "currency_symbol": "₹",
+        "tax_label": "GST",
+        "default_tax_rate": 18,
+        "phone": "+91 9876543210",
+        "email": "contact@studio.com",
+        "address": "Workshop Operations Center",
+        "gstin": "21AAAPL1234L1Z5",
+        "upi_name": "Studio Operations",
+        "upi_id": "studio@upi",
+        "theme": "navy"
+    }'::jsonb,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_tenants_slug ON public.tenants(slug);
+
+-- ============================================================================
+-- 2. TENANT USER MEMBERSHIPS & ROLES (RBAC)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS public.tenant_users (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    full_name VARCHAR(255),
+    role VARCHAR(50) NOT NULL DEFAULT 'cashier', -- 'owner', 'manager', 'cashier', 'technician'
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(tenant_id, user_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_tenant_users_user ON public.tenant_users(user_id);
+CREATE INDEX IF NOT EXISTS idx_tenant_users_tenant ON public.tenant_users(tenant_id);
+
+-- ============================================================================
+-- 3. INVENTORY PRODUCTS TABLE (TENANT ISOLATED)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS public.inventory_products (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
+    name VARCHAR(255) NOT NULL,
+    sku VARCHAR(100),
     category VARCHAR(100) NOT NULL DEFAULT 'Consumables',
     unit VARCHAR(50) NOT NULL DEFAULT 'pcs', -- 'pcs', 'ml', 'liters', 'meters', 'rolls', 'bottles'
     current_stock NUMERIC(12,2) NOT NULL DEFAULT 0,
     min_stock_alert NUMERIC(12,2) NOT NULL DEFAULT 5,
     purchase_price NUMERIC(12,2) NOT NULL DEFAULT 0,
     selling_price NUMERIC(12,2) NOT NULL DEFAULT 0,
+    barcode VARCHAR(100),
     image_url TEXT,
     is_active BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_inventory_category ON public.inventory_products(category);
-CREATE INDEX IF NOT EXISTS idx_inventory_active ON public.inventory_products(is_active);
+CREATE INDEX IF NOT EXISTS idx_inventory_tenant ON public.inventory_products(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_inventory_category ON public.inventory_products(tenant_id, category);
 
--- 2. INVOICES TABLE
+-- ============================================================================
+-- 4. STUDIO SERVICES TABLE (TENANT ISOLATED)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS public.studio_services (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
+    name VARCHAR(255) NOT NULL,
+    short_code VARCHAR(100),
+    tagline TEXT,
+    price NUMERIC(12,2) NOT NULL DEFAULT 0,
+    category VARCHAR(100) NOT NULL DEFAULT 'Studio Services',
+    is_active BOOLEAN NOT NULL DEFAULT true,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_services_tenant ON public.studio_services(tenant_id);
+
+-- ============================================================================
+-- 5. CUSTOMERS TABLE (TENANT ISOLATED)
+-- ============================================================================
+CREATE TABLE IF NOT EXISTS public.customers (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
+    customer_name VARCHAR(255) NOT NULL,
+    customer_phone VARCHAR(50),
+    email VARCHAR(255),
+    vehicle_info JSONB NOT NULL DEFAULT '{}'::jsonb,
+    pending_balance NUMERIC(12,2) NOT NULL DEFAULT 0,
+    wallet_balance NUMERIC(12,2) NOT NULL DEFAULT 0,
+    notes TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_customers_tenant ON public.customers(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_customers_phone ON public.customers(tenant_id, customer_phone);
+
+-- ============================================================================
+-- 6. INVOICES TABLE (TENANT ISOLATED)
+-- ============================================================================
 CREATE TABLE IF NOT EXISTS public.invoices (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    invoice_number VARCHAR(50) UNIQUE NOT NULL,
-    customer_id UUID REFERENCES public.leads(id) ON DELETE SET NULL,
+    tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
+    invoice_number VARCHAR(50) NOT NULL,
+    customer_id UUID REFERENCES public.customers(id) ON DELETE SET NULL,
     customer_name VARCHAR(255) NOT NULL DEFAULT 'Customer',
     customer_phone VARCHAR(50),
-    vehicle_info JSONB NOT NULL DEFAULT '{}'::jsonb, -- {"make": "BMW", "model": "M340i", "reg_number": "OD02AB1234"}
+    vehicle_info JSONB NOT NULL DEFAULT '{}'::jsonb,
     billing_date TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     subtotal NUMERIC(12,2) NOT NULL DEFAULT 0,
     discount_amount NUMERIC(12,2) NOT NULL DEFAULT 0,
@@ -44,22 +139,26 @@ CREATE TABLE IF NOT EXISTS public.invoices (
     paid_amount NUMERIC(12,2) NOT NULL DEFAULT 0,
     balance_due NUMERIC(12,2) NOT NULL DEFAULT 0,
     payment_status VARCHAR(50) NOT NULL DEFAULT 'paid', -- 'paid', 'partial', 'due'
-    payment_method VARCHAR(50) NOT NULL DEFAULT 'Cash', -- 'Cash', 'UPI', 'GPay', 'Card', 'Split'
-    payment_split JSONB NOT NULL DEFAULT '[]'::jsonb, -- [{"method": "Cash", "amount": 5000}, {"method": "GPay", "amount": 2700}]
+    payment_method VARCHAR(50) NOT NULL DEFAULT 'Cash', -- 'Cash', 'UPI', 'GPay', 'Card', 'Bank Transfer', 'Split'
+    payment_split JSONB NOT NULL DEFAULT '[]'::jsonb,
     gst_number VARCHAR(50),
     notes TEXT,
+    created_by UUID,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(tenant_id, invoice_number)
 );
 
-CREATE INDEX IF NOT EXISTS idx_invoices_customer_id ON public.invoices(customer_id);
-CREATE INDEX IF NOT EXISTS idx_invoices_customer_phone ON public.invoices(customer_phone);
-CREATE INDEX IF NOT EXISTS idx_invoices_billing_date ON public.invoices(billing_date DESC);
-CREATE INDEX IF NOT EXISTS idx_invoices_payment_status ON public.invoices(payment_status);
+CREATE INDEX IF NOT EXISTS idx_invoices_tenant ON public.invoices(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_invoices_tenant_date ON public.invoices(tenant_id, billing_date DESC);
+CREATE INDEX IF NOT EXISTS idx_invoices_tenant_status ON public.invoices(tenant_id, payment_status);
 
--- 3. INVOICE LINE ITEMS TABLE
+-- ============================================================================
+-- 7. INVOICE LINE ITEMS TABLE (TENANT ISOLATED)
+-- ============================================================================
 CREATE TABLE IF NOT EXISTS public.invoice_items (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
     invoice_id UUID NOT NULL REFERENCES public.invoices(id) ON DELETE CASCADE,
     item_type VARCHAR(50) NOT NULL DEFAULT 'service', -- 'service', 'product', 'package'
     item_id VARCHAR(100),
@@ -74,27 +173,34 @@ CREATE TABLE IF NOT EXISTS public.invoice_items (
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE INDEX IF NOT EXISTS idx_invoice_items_tenant ON public.invoice_items(tenant_id);
 CREATE INDEX IF NOT EXISTS idx_invoice_items_invoice ON public.invoice_items(invoice_id);
 
--- 4. EXPENSE ENTRIES TABLE
+-- ============================================================================
+-- 8. EXPENSES TABLE (TENANT ISOLATED)
+-- ============================================================================
 CREATE TABLE IF NOT EXISTS public.expenses (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
     title VARCHAR(255) NOT NULL,
-    category VARCHAR(100) NOT NULL DEFAULT 'Miscellaneous', -- 'Raw Materials & Supplies', 'Salaries & Wages', 'Rent & Studio', 'Utilities & Electricity', 'Tea & Refreshments', 'Marketing & Ads', 'Equipment Maintenance', 'Miscellaneous'
+    category VARCHAR(100) NOT NULL DEFAULT 'Miscellaneous',
     amount NUMERIC(12,2) NOT NULL DEFAULT 0,
-    payment_mode VARCHAR(50) NOT NULL DEFAULT 'Cash', -- 'Cash', 'GPay', 'UPI', 'Bank Transfer', 'Card'
+    payment_mode VARCHAR(50) NOT NULL DEFAULT 'Cash',
     expense_date DATE NOT NULL DEFAULT CURRENT_DATE,
     notes TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_expenses_date ON public.expenses(expense_date DESC);
-CREATE INDEX IF NOT EXISTS idx_expenses_category ON public.expenses(category);
+CREATE INDEX IF NOT EXISTS idx_expenses_tenant ON public.expenses(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_expenses_tenant_date ON public.expenses(tenant_id, expense_date DESC);
 
--- 5. APPOINTMENTS TABLE
+-- ============================================================================
+-- 9. APPOINTMENTS TABLE (TENANT ISOLATED)
+-- ============================================================================
 CREATE TABLE IF NOT EXISTS public.appointments (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    customer_id UUID REFERENCES public.leads(id) ON DELETE SET NULL,
+    tenant_id UUID NOT NULL REFERENCES public.tenants(id) ON DELETE CASCADE,
+    customer_id UUID REFERENCES public.customers(id) ON DELETE SET NULL,
     customer_name VARCHAR(255) NOT NULL,
     customer_phone VARCHAR(50),
     vehicle_info JSONB NOT NULL DEFAULT '{}'::jsonb,
@@ -110,10 +216,12 @@ CREATE TABLE IF NOT EXISTS public.appointments (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_appointments_date ON public.appointments(appointment_date);
-CREATE INDEX IF NOT EXISTS idx_appointments_status ON public.appointments(status);
+CREATE INDEX IF NOT EXISTS idx_appointments_tenant ON public.appointments(tenant_id);
+CREATE INDEX IF NOT EXISTS idx_appointments_tenant_date ON public.appointments(tenant_id, appointment_date);
 
--- Automatic stock decrement trigger when an invoice item of type 'product' is created
+-- ============================================================================
+-- 10. STOCK DECREMENT TRIGGER (PER TENANT)
+-- ============================================================================
 CREATE OR REPLACE FUNCTION public.decrement_inventory_on_invoice()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -121,7 +229,8 @@ BEGIN
         UPDATE public.inventory_products
         SET current_stock = current_stock - NEW.quantity,
             updated_at = NOW()
-        WHERE id = NEW.item_id::uuid;
+        WHERE id = NEW.item_id::uuid
+          AND tenant_id = NEW.tenant_id;
     END IF;
     RETURN NEW;
 END;
@@ -132,17 +241,56 @@ CREATE TRIGGER trg_invoice_decrement_stock
 AFTER INSERT ON public.invoice_items
 FOR EACH ROW EXECUTE FUNCTION public.decrement_inventory_on_invoice();
 
--- Initial Seed of Inventory Consumables
-INSERT INTO public.inventory_products (name, sku, category, unit, current_stock, min_stock_alert, purchase_price, selling_price)
-VALUES
-('Garware Hi-Gloss PPF Roll (15m)', 'PPF-GAR-15M', 'PPF & Films', 'rolls', 6.00, 2.00, 32000.00, 48000.00),
-('Avery Dennison Supreme PPF (15m)', 'PPF-AVERY-15M', 'PPF & Films', 'rolls', 4.00, 1.00, 52000.00, 75000.00),
-('CarPro CQuartz UK 3.0 Ceramic (50ml)', 'CER-CQ-50ML', 'Ceramics & Coatings', 'bottles', 18.00, 5.00, 3800.00, 6500.00),
-('Gyeon Q2 Mohs EVO Ceramic (50ml)', 'CER-GYE-50ML', 'Ceramics & Coatings', 'bottles', 12.00, 4.00, 4500.00, 8000.00),
-('Koch-Chemie Heavy Cut H9.02 (1L)', 'POL-KC-H9', 'Polishing & Compounds', 'liters', 9.00, 2.00, 2400.00, 3400.00),
-('Koch-Chemie Micro Cut M3.02 (1L)', 'POL-KC-M3', 'Polishing & Compounds', 'liters', 8.00, 2.00, 2600.00, 3600.00),
-('Meguiar''s Hyper Wash Shampoo (3.8L)', 'WSH-MEG-38L', 'Shampoos & Chemicals', 'bottles', 7.00, 2.00, 2800.00, 3800.00),
-('Gyeon Q2M Iron Remover (1L)', 'CHM-GYE-IRN', 'Shampoos & Chemicals', 'bottles', 10.00, 3.00, 1900.00, 2600.00),
-('Maxshine 5" Wool Cutting Pad', 'PAD-MAX-WOOL', 'Pads & Towels', 'pcs', 25.00, 8.00, 450.00, 750.00),
-('Edgeless 500 GSM Microfiber Towels (Pack of 5)', 'TWL-500GSM-5P', 'Pads & Towels', 'pcs', 30.00, 10.00, 600.00, 1100.00)
-ON CONFLICT DO NOTHING;
+-- ============================================================================
+-- 11. ROW LEVEL SECURITY (RLS) POLICIES
+-- ============================================================================
+ALTER TABLE public.tenants ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.tenant_users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.inventory_products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.studio_services ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.customers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.invoices ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.invoice_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.expenses ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.appointments ENABLE ROW LEVEL SECURITY;
+
+-- Helper function to check if the current auth user belongs to the tenant
+CREATE OR REPLACE FUNCTION public.is_member_of(target_tenant_id UUID)
+RETURNS BOOLEAN AS $$
+BEGIN
+    RETURN EXISTS (
+        SELECT 1 FROM public.tenant_users
+        WHERE tenant_id = target_tenant_id
+          AND user_id = auth.uid()
+          AND is_active = true
+    );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Policies for tenant-isolated data
+CREATE POLICY "Tenants user membership access" ON public.tenants
+    FOR ALL USING (id IN (SELECT tenant_id FROM public.tenant_users WHERE user_id = auth.uid()));
+
+CREATE POLICY "Tenant users membership access" ON public.tenant_users
+    FOR ALL USING (tenant_id IN (SELECT tenant_id FROM public.tenant_users WHERE user_id = auth.uid()));
+
+CREATE POLICY "Inventory Products Isolation" ON public.inventory_products
+    FOR ALL USING (public.is_member_of(tenant_id));
+
+CREATE POLICY "Services Isolation" ON public.studio_services
+    FOR ALL USING (public.is_member_of(tenant_id));
+
+CREATE POLICY "Customers Isolation" ON public.customers
+    FOR ALL USING (public.is_member_of(tenant_id));
+
+CREATE POLICY "Invoices Isolation" ON public.invoices
+    FOR ALL USING (public.is_member_of(tenant_id));
+
+CREATE POLICY "Invoice Items Isolation" ON public.invoice_items
+    FOR ALL USING (public.is_member_of(tenant_id));
+
+CREATE POLICY "Expenses Isolation" ON public.expenses
+    FOR ALL USING (public.is_member_of(tenant_id));
+
+CREATE POLICY "Appointments Isolation" ON public.appointments
+    FOR ALL USING (public.is_member_of(tenant_id));

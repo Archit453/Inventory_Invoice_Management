@@ -1,7 +1,7 @@
 import { supabase } from './supabase';
 import type { Customer, StudioService, InventoryProduct, Invoice, Expense, Appointment } from '../types';
 
-// Default Seed Data mirroring the demo video workflow
+// Default Seed Data for primary demo tenant
 export const DEFAULT_SERVICES: StudioService[] = [
   { id: 's-1', name: '🛡️ Garware Plus Hi-Gloss PPF', short_code: 'ppf_garware', tagline: 'Self-healing ultra-gloss TPU protective film', price: 65000, category: 'Paint Protection' },
   { id: 's-2', name: '✨ 9H/10H Dual-Layer Ceramic Shield', short_code: 'ceramic_9h', tagline: 'Extreme candy gloss & hydrophobic barrier', price: 28000, category: 'Ceramic Coating' },
@@ -168,8 +168,8 @@ export const DEFAULT_INVOICES: Invoice[] = [
     vehicle_info: { make: 'BMW', model: 'M340i xDrive', reg_number: 'OD 02 AB 1234' },
     billing_date: new Date(Date.now() - 2 * 3600000).toISOString(),
     items: [
-      { id: 'item-1', item_type: 'service', name: '🛡️ Garware Plus Hi-Gloss PPF', rate: 65000, quantity: 1, gst_percent: 18, tax_amount: 11700, total_amount: 76700, assigned_staff: 'Rohan' },
-      { id: 'item-2', item_type: 'product', name: 'CarPro CQuartz UK 3.0 Ceramic (50ml)', rate: 6500, quantity: 1, gst_percent: 18, tax_amount: 1170, total_amount: 7670, assigned_staff: 'Amit' },
+      { id: 'item-1', item_type: 'service', name: '🛡️ Garware Plus Hi-Gloss PPF', rate: 65000, quantity: 1, gst_percent: 18, tax_amount: 11700, total_amount: 76700, assigned_staff: 'Rohan (Lead Technician)' },
+      { id: 'item-2', item_type: 'product', name: 'CarPro CQuartz UK 3.0 Ceramic (50ml)', rate: 6500, quantity: 1, gst_percent: 18, tax_amount: 1170, total_amount: 7670, assigned_staff: 'Amit (PPF Specialist)' },
     ],
     subtotal: 71500,
     discount_amount: 1470,
@@ -189,8 +189,8 @@ export const DEFAULT_INVOICES: Invoice[] = [
     vehicle_info: { make: 'Mercedes-Benz', model: 'GLC 300', reg_number: 'OD 02 BR 5555' },
     billing_date: new Date(Date.now() - 24 * 3600000).toISOString(),
     items: [
-      { id: 'item-3', item_type: 'service', name: '🚿 pH-Neutral Snow Foam Wash & Engine Bay', rate: 2000, quantity: 1, gst_percent: 18, tax_amount: 360, total_amount: 2360, assigned_staff: 'Sanjay' },
-      { id: 'item-4', item_type: 'service', name: '🛡️ Windshield & Glass Hydrophobic Coating', rate: 4500, quantity: 1, gst_percent: 18, tax_amount: 810, total_amount: 5310, assigned_staff: 'Sanjay' },
+      { id: 'item-3', item_type: 'service', name: '🚿 pH-Neutral Snow Foam Wash & Engine Bay', rate: 2000, quantity: 1, gst_percent: 18, tax_amount: 360, total_amount: 2360, assigned_staff: 'Sanjay (Coating Pro)' },
+      { id: 'item-4', item_type: 'service', name: '🛡️ Windshield & Glass Hydrophobic Coating', rate: 4500, quantity: 1, gst_percent: 18, tax_amount: 810, total_amount: 5310, assigned_staff: 'Sanjay (Coating Pro)' },
     ],
     subtotal: 6500,
     discount_amount: 0,
@@ -210,7 +210,7 @@ export const DEFAULT_INVOICES: Invoice[] = [
     vehicle_info: { make: 'Audi', model: 'A6 Matrix', reg_number: 'OD 02 CD 9999' },
     billing_date: new Date(Date.now() - 48 * 3600000).toISOString(),
     items: [
-      { id: 'item-5', item_type: 'service', name: '🧼 Deep Steam Interior Detailing & Sanitization', rate: 7500, quantity: 1, gst_percent: 18, tax_amount: 1350, total_amount: 8850, assigned_staff: 'Amit' },
+      { id: 'item-5', item_type: 'service', name: '🧼 Deep Steam Interior Detailing & Sanitization', rate: 7500, quantity: 1, gst_percent: 18, tax_amount: 1350, total_amount: 8850, assigned_staff: 'Amit (PPF Specialist)' },
     ],
     subtotal: 7500,
     discount_amount: 0,
@@ -230,7 +230,7 @@ export const DEFAULT_INVOICES: Invoice[] = [
     vehicle_info: { make: 'BMW', model: 'M340i xDrive', reg_number: 'OD 02 AB 1234' },
     billing_date: new Date(Date.now() - 72 * 3600000).toISOString(),
     items: [
-      { id: 'item-6', item_type: 'service', name: '🚿 pH-Neutral Snow Foam Wash', rate: 2000, quantity: 1, gst_percent: 18, tax_amount: 360, total_amount: 2360, assigned_staff: 'Rohan' },
+      { id: 'item-6', item_type: 'service', name: '🚿 pH-Neutral Snow Foam Wash', rate: 2000, quantity: 1, gst_percent: 18, tax_amount: 360, total_amount: 2360, assigned_staff: 'Rohan (Lead Technician)' },
     ],
     subtotal: 2000,
     discount_amount: 0,
@@ -295,7 +295,7 @@ export const DEFAULT_APPOINTMENTS: Appointment[] = [
     advance_amount: 1500,
     advance_payment_method: 'GPay',
     services_requested: ['✨ 9H/10H Dual-Layer Ceramic Shield'],
-    assigned_staff: 'Amit',
+    assigned_staff: 'Amit (PPF Specialist)',
     notes: 'Customer requested headlight tint film as well',
   },
   {
@@ -309,7 +309,7 @@ export const DEFAULT_APPOINTMENTS: Appointment[] = [
     advance_amount: 5000,
     advance_payment_method: 'UPI',
     services_requested: ['🛡️ Garware Plus Hi-Gloss PPF'],
-    assigned_staff: 'Rohan',
+    assigned_staff: 'Rohan (Lead Technician)',
     notes: 'Full front bumper + bonnet + mirrors PPF',
   },
   {
@@ -323,38 +323,44 @@ export const DEFAULT_APPOINTMENTS: Appointment[] = [
     advance_amount: 0,
     advance_payment_method: 'Cash',
     services_requested: ['🚿 pH-Neutral Snow Foam Wash & Engine Bay'],
-    assigned_staff: 'Sanjay',
+    assigned_staff: 'Sanjay (Coating Pro)',
     notes: 'Periodic maintenance wash',
   },
 ];
 
-// LocalStorage Persistence Keys
-const STORAGE_KEYS = {
-  INVOICES: 'iim_invoices_v1',
-  PRODUCTS: 'iim_products_v1',
-  EXPENSES: 'iim_expenses_v1',
-  APPOINTMENTS: 'iim_appointments_v1',
-  CUSTOMERS: 'iim_customers_v1',
-  SERVICES: 'iim_services_v1',
-};
-
-// Data Store Class providing unified offline-first + Supabase synchronization
+// Multi-Tenant Data Store Class providing unified offline-first + Supabase RLS synchronization
 export class DataStore {
+  private static activeTenantId: string = 'tenant-apex';
+
+  static setActiveTenantId(tenantId: string) {
+    this.activeTenantId = tenantId;
+  }
+
+  static getActiveTenantId(): string {
+    return this.activeTenantId;
+  }
+
+  private static key(entity: string): string {
+    return `iim_${this.activeTenantId}_${entity}_v1`;
+  }
+
   // --- INVOICES ---
   static getInvoices(): Invoice[] {
-    const raw = localStorage.getItem(STORAGE_KEYS.INVOICES);
+    const raw = localStorage.getItem(this.key('invoices'));
     if (!raw) {
-      localStorage.setItem(STORAGE_KEYS.INVOICES, JSON.stringify(DEFAULT_INVOICES));
-      return DEFAULT_INVOICES;
+      const initial = this.activeTenantId === 'tenant-apex' ? DEFAULT_INVOICES : [];
+      localStorage.setItem(this.key('invoices'), JSON.stringify(initial));
+      return initial;
     }
     try {
       return JSON.parse(raw);
     } catch {
-      return DEFAULT_INVOICES;
+      return [];
     }
   }
 
   static saveInvoice(invoice: Invoice): Invoice {
+    invoice.tenant_id = this.activeTenantId;
     const invoices = this.getInvoices();
     const existingIndex = invoices.findIndex(i => i.id === invoice.id || i.invoice_number === invoice.invoice_number);
     
@@ -364,7 +370,7 @@ export class DataStore {
       invoices.unshift(invoice);
     }
     
-    localStorage.setItem(STORAGE_KEYS.INVOICES, JSON.stringify(invoices));
+    localStorage.setItem(this.key('invoices'), JSON.stringify(invoices));
 
     // Deduct stock for any product line items
     if (invoice.items && invoice.items.length > 0) {
@@ -375,9 +381,10 @@ export class DataStore {
       });
     }
 
-    // Attempt cloud sync with Supabase (fire-and-forget safe)
+    // Cloud sync with Supabase (scoped to tenant_id)
     supabase.from('invoices').upsert({
       id: invoice.id,
+      tenant_id: this.activeTenantId,
       invoice_number: invoice.invoice_number,
       customer_id: invoice.customer_id,
       customer_name: invoice.customer_name,
@@ -404,25 +411,27 @@ export class DataStore {
 
   static deleteInvoice(id: string): void {
     const invoices = this.getInvoices().filter(i => i.id !== id);
-    localStorage.setItem(STORAGE_KEYS.INVOICES, JSON.stringify(invoices));
-    supabase.from('invoices').delete().eq('id', id).then();
+    localStorage.setItem(this.key('invoices'), JSON.stringify(invoices));
+    supabase.from('invoices').delete().eq('id', id).eq('tenant_id', this.activeTenantId).then();
   }
 
   // --- PRODUCTS & INVENTORY ---
   static getProducts(): InventoryProduct[] {
-    const raw = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
+    const raw = localStorage.getItem(this.key('products'));
     if (!raw) {
-      localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(DEFAULT_PRODUCTS));
-      return DEFAULT_PRODUCTS;
+      const initial = this.activeTenantId === 'tenant-apex' ? DEFAULT_PRODUCTS : [];
+      localStorage.setItem(this.key('products'), JSON.stringify(initial));
+      return initial;
     }
     try {
       return JSON.parse(raw);
     } catch {
-      return DEFAULT_PRODUCTS;
+      return [];
     }
   }
 
   static saveProduct(product: InventoryProduct): InventoryProduct {
+    product.tenant_id = this.activeTenantId;
     const products = this.getProducts();
     const idx = products.findIndex(p => p.id === product.id);
     if (idx >= 0) {
@@ -430,9 +439,12 @@ export class DataStore {
     } else {
       products.push(product);
     }
-    localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
+    localStorage.setItem(this.key('products'), JSON.stringify(products));
 
-    supabase.from('inventory_products').upsert(product).then(({ error }) => {
+    supabase.from('inventory_products').upsert({
+      ...product,
+      tenant_id: this.activeTenantId,
+    }).then(({ error }) => {
       if (error) console.info('Supabase product sync notice:', error.message);
     });
     return product;
@@ -443,32 +455,38 @@ export class DataStore {
     const idx = products.findIndex(p => p.id === productId);
     if (idx >= 0) {
       products[idx].current_stock = Math.max(0, products[idx].current_stock + quantityDelta);
-      localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
-      supabase.from('inventory_products').update({ current_stock: products[idx].current_stock }).eq('id', productId).then();
+      localStorage.setItem(this.key('products'), JSON.stringify(products));
+      supabase.from('inventory_products')
+        .update({ current_stock: products[idx].current_stock })
+        .eq('id', productId)
+        .eq('tenant_id', this.activeTenantId)
+        .then();
     }
   }
 
   static deleteProduct(id: string): void {
     const products = this.getProducts().filter(p => p.id !== id);
-    localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
-    supabase.from('inventory_products').delete().eq('id', id).then();
+    localStorage.setItem(this.key('products'), JSON.stringify(products));
+    supabase.from('inventory_products').delete().eq('id', id).eq('tenant_id', this.activeTenantId).then();
   }
 
   // --- EXPENSES ---
   static getExpenses(): Expense[] {
-    const raw = localStorage.getItem(STORAGE_KEYS.EXPENSES);
+    const raw = localStorage.getItem(this.key('expenses'));
     if (!raw) {
-      localStorage.setItem(STORAGE_KEYS.EXPENSES, JSON.stringify(DEFAULT_EXPENSES));
-      return DEFAULT_EXPENSES;
+      const initial = this.activeTenantId === 'tenant-apex' ? DEFAULT_EXPENSES : [];
+      localStorage.setItem(this.key('expenses'), JSON.stringify(initial));
+      return initial;
     }
     try {
       return JSON.parse(raw);
     } catch {
-      return DEFAULT_EXPENSES;
+      return [];
     }
   }
 
   static saveExpense(expense: Expense): Expense {
+    expense.tenant_id = this.activeTenantId;
     const expenses = this.getExpenses();
     const idx = expenses.findIndex(e => e.id === expense.id);
     if (idx >= 0) {
@@ -476,9 +494,12 @@ export class DataStore {
     } else {
       expenses.unshift(expense);
     }
-    localStorage.setItem(STORAGE_KEYS.EXPENSES, JSON.stringify(expenses));
+    localStorage.setItem(this.key('expenses'), JSON.stringify(expenses));
 
-    supabase.from('expenses').upsert(expense).then(({ error }) => {
+    supabase.from('expenses').upsert({
+      ...expense,
+      tenant_id: this.activeTenantId,
+    }).then(({ error }) => {
       if (error) console.info('Supabase expense sync notice:', error.message);
     });
     return expense;
@@ -486,25 +507,27 @@ export class DataStore {
 
   static deleteExpense(id: string): void {
     const expenses = this.getExpenses().filter(e => e.id !== id);
-    localStorage.setItem(STORAGE_KEYS.EXPENSES, JSON.stringify(expenses));
-    supabase.from('expenses').delete().eq('id', id).then();
+    localStorage.setItem(this.key('expenses'), JSON.stringify(expenses));
+    supabase.from('expenses').delete().eq('id', id).eq('tenant_id', this.activeTenantId).then();
   }
 
   // --- APPOINTMENTS ---
   static getAppointments(): Appointment[] {
-    const raw = localStorage.getItem(STORAGE_KEYS.APPOINTMENTS);
+    const raw = localStorage.getItem(this.key('appointments'));
     if (!raw) {
-      localStorage.setItem(STORAGE_KEYS.APPOINTMENTS, JSON.stringify(DEFAULT_APPOINTMENTS));
-      return DEFAULT_APPOINTMENTS;
+      const initial = this.activeTenantId === 'tenant-apex' ? DEFAULT_APPOINTMENTS : [];
+      localStorage.setItem(this.key('appointments'), JSON.stringify(initial));
+      return initial;
     }
     try {
       return JSON.parse(raw);
     } catch {
-      return DEFAULT_APPOINTMENTS;
+      return [];
     }
   }
 
   static saveAppointment(apt: Appointment): Appointment {
+    apt.tenant_id = this.activeTenantId;
     const appointments = this.getAppointments();
     const idx = appointments.findIndex(a => a.id === apt.id);
     if (idx >= 0) {
@@ -512,9 +535,12 @@ export class DataStore {
     } else {
       appointments.unshift(apt);
     }
-    localStorage.setItem(STORAGE_KEYS.APPOINTMENTS, JSON.stringify(appointments));
+    localStorage.setItem(this.key('appointments'), JSON.stringify(appointments));
 
-    supabase.from('appointments').upsert(apt).then(({ error }) => {
+    supabase.from('appointments').upsert({
+      ...apt,
+      tenant_id: this.activeTenantId,
+    }).then(({ error }) => {
       if (error) console.info('Supabase appointment sync notice:', error.message);
     });
     return apt;
@@ -522,91 +548,85 @@ export class DataStore {
 
   static deleteAppointment(id: string): void {
     const appointments = this.getAppointments().filter(a => a.id !== id);
-    localStorage.setItem(STORAGE_KEYS.APPOINTMENTS, JSON.stringify(appointments));
-    supabase.from('appointments').delete().eq('id', id).then();
+    localStorage.setItem(this.key('appointments'), JSON.stringify(appointments));
+    supabase.from('appointments').delete().eq('id', id).eq('tenant_id', this.activeTenantId).then();
   }
 
-  // --- CUSTOMERS / CRM LEADS ---
+  // --- CUSTOMERS ---
   static async getCustomers(): Promise<Customer[]> {
+    const raw = localStorage.getItem(this.key('customers'));
+    if (!raw) {
+      const initial = this.activeTenantId === 'tenant-apex' ? DEFAULT_CUSTOMERS : [];
+      localStorage.setItem(this.key('customers'), JSON.stringify(initial));
+      return initial;
+    }
     try {
-      // Direct CRM integration: fetch from public.leads
-      const { data, error } = await supabase
-        .from('leads')
-        .select('id, customer_name, customer_phone, email, vehicle_info')
-        .order('created_at', { ascending: false });
-
-      if (!error && data && data.length > 0) {
-        const mapped: Customer[] = data.map(lead => ({
-          id: lead.id,
-          customer_name: lead.customer_name || 'Customer',
-          customer_phone: lead.customer_phone || '',
-          email: lead.email || '',
-          vehicle_info: typeof lead.vehicle_info === 'object' ? lead.vehicle_info : {},
-          pending_balance: 0,
-          wallet_balance: 0,
-        }));
-        localStorage.setItem(STORAGE_KEYS.CUSTOMERS, JSON.stringify(mapped));
-        return mapped;
-      }
+      return JSON.parse(raw);
     } catch {
-      // Fallback to local
+      return [];
     }
-
-    const raw = localStorage.getItem(STORAGE_KEYS.CUSTOMERS);
-    if (raw) {
-      try { return JSON.parse(raw); } catch {}
-    }
-    localStorage.setItem(STORAGE_KEYS.CUSTOMERS, JSON.stringify(DEFAULT_CUSTOMERS));
-    return DEFAULT_CUSTOMERS;
   }
 
   static saveCustomer(customer: Customer): Customer {
-    const raw = localStorage.getItem(STORAGE_KEYS.CUSTOMERS);
-    let list: Customer[] = raw ? JSON.parse(raw) : DEFAULT_CUSTOMERS;
-    const idx = list.findIndex(c => c.id === customer.id || (customer.customer_phone && c.customer_phone === customer.customer_phone));
+    customer.tenant_id = this.activeTenantId;
+    const customers = this.getCustomersSync();
+    const idx = customers.findIndex(c => c.id === customer.id || (customer.customer_phone && c.customer_phone === customer.customer_phone));
     if (idx >= 0) {
-      list[idx] = { ...list[idx], ...customer };
+      customers[idx] = { ...customers[idx], ...customer };
     } else {
-      list.unshift(customer);
+      customers.unshift(customer);
     }
-    localStorage.setItem(STORAGE_KEYS.CUSTOMERS, JSON.stringify(list));
+    localStorage.setItem(this.key('customers'), JSON.stringify(customers));
 
-    // Also sync back to CRM leads table!
-    supabase.from('leads').upsert({
-      id: customer.id.startsWith('cust-') ? undefined : customer.id,
-      customer_name: customer.customer_name,
-      customer_phone: customer.customer_phone,
-      email: customer.email,
-      vehicle_info: customer.vehicle_info || {},
-      service_name: 'Studio Visit / Billing',
-      source: 'walk_in',
+    supabase.from('customers').upsert({
+      ...customer,
+      tenant_id: this.activeTenantId,
     }).then();
 
     return customer;
   }
 
+  static getCustomersSync(): Customer[] {
+    const raw = localStorage.getItem(this.key('customers'));
+    if (!raw) {
+      return this.activeTenantId === 'tenant-apex' ? DEFAULT_CUSTOMERS : [];
+    }
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return [];
+    }
+  }
+
   // --- SERVICES CATALOG ---
   static async getServices(): Promise<StudioService[]> {
+    const raw = localStorage.getItem(this.key('services'));
+    if (!raw) {
+      const initial = this.activeTenantId === 'tenant-apex' ? DEFAULT_SERVICES : [
+        { id: 's-gen-1', name: '🛠️ General Service / Repair', price: 2500, category: 'General' },
+        { id: 's-gen-2', name: '🧼 Premium Cleaning', price: 1500, category: 'Washing' },
+      ];
+      localStorage.setItem(this.key('services'), JSON.stringify(initial));
+      return initial;
+    }
     try {
-      const { data, error } = await supabase
-        .from('studio_services')
-        .select('*')
-        .eq('is_active', true)
-        .order('order_index');
+      return JSON.parse(raw);
+    } catch {
+      return DEFAULT_SERVICES;
+    }
+  }
 
-      if (!error && data && data.length > 0) {
-        return data.map(s => ({
-          id: s.id,
-          name: s.name,
-          short_code: s.short_code,
-          tagline: s.tagline,
-          description: s.description,
-          price: 15000, // default base studio price
-          category: 'Studio Services',
-        }));
-      }
-    } catch {}
-
-    return DEFAULT_SERVICES;
+  static saveService(service: StudioService): StudioService {
+    service.tenant_id = this.activeTenantId;
+    const raw = localStorage.getItem(this.key('services'));
+    const list: StudioService[] = raw ? JSON.parse(raw) : DEFAULT_SERVICES;
+    const idx = list.findIndex(s => s.id === service.id);
+    if (idx >= 0) {
+      list[idx] = service;
+    } else {
+      list.push(service);
+    }
+    localStorage.setItem(this.key('services'), JSON.stringify(list));
+    return service;
   }
 }
